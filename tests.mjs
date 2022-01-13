@@ -1,4 +1,4 @@
-import { chiSquared, guessDiceType, makeRollSetFromRolls, parseDiceRolls, RollSet } from './lib.mjs';
+import { calcChiSquared, chiSquaredCdfAt, guessDiceType, makeRollSetFromRolls, parseDiceRolls, RollSet } from './lib.mjs';
 
 test('parseDiceRolls() parses a set of clean d6 inputs', () => {
   const input = "5\n1\n4\n1\n4\n2\n1\n3\n5\n4\n";
@@ -122,11 +122,17 @@ test('guessDiceType() identifies any collection of side types', () => {
   assert(guess.sides === 4);
 });
 
-test('chiSquared() reports zero for a uniformly-distributed set of dice rolls', () => {
+test('calcChiSquared() reports zero for a uniformly-distributed set of dice rolls', () => {
   // build a set of 100 d20 rolls, where each side was rolled exactly 5 times
   const rolls = new RollSet(new Map(Array(20).fill(0).map((_, i) => ['' + (i + 1), 5])));
-  assert(chiSquared(rolls, 20) === 0);
+  assert(calcChiSquared(rolls, 20) === 0);
 });
+
+test('chiSquaredCdfAt() returns a correct response for a given chi-squared value', () => {
+  const confidence = chiSquaredCdfAt(27.204, 20);
+  console.log(confidence);
+  assert(Math.abs(confidence - 0.90) < 0.001);
+})
 
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {

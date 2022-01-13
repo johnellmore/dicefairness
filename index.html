@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    @media (min-width: 1000px) {
+      html {
+        font-size: 20px;
+      }
+    }
+
+    body {
+      margin: 1em;
+      background-color: white;
+    }
+
+    p {
+      margin: 1.5em 0;
+    }
+
+    .intro {
+      max-width: 800px;
+      margin: 0 auto 1.5em;
+      border-bottom: 1px solid #999;
+    }
+
+    .interface {
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .interface textarea {
+      flex: 1 0 200px;
+      font-size: 1em;
+      font-family: inherit;
+      margin-right: 1em;
+    }
+
+    .interface .report {
+      flex: 4 0 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="intro">
+    <h1>Die Fairness Tester</h1>
+    <p>
+      Take any single die (or coin, or other object that should yield a
+      uniformly-distributed set of random values). Roll it, and enter each value
+      in the box below, one value per line. As you add more values, the page
+      will try to guess the type of die that you're using and keep track of how
+      many more values you need. Once you add in enough values, you'll see stats
+      about the object's fairness.
+    </p>
+  </div>
+  <div class="interface">
+    <textarea rows="10" cols="10" autofocus placeholder="Enter dice rolls here"></textarea>
+    <div class="report">
+      <!-- populated by JS below -->
+    </div>
+  </div>
+  <script src="./jstat.min.js"></script>
+  <script type="module">
+    import {
+      calcChiSquared,
+      chiSquaredCdfAt,
+      guessDiceType,
+      makeRollSetFromRolls,
+      parseDiceRolls,
+      RollSet,
+      suggestedMinimumDiceRolls
+    } from './lib.mjs';
+    
+    const textarea = document.querySelector('textarea');
+    const report = document.querySelector('.report');
+    textarea.addEventListener('keyup', () => recalculate());
+    textarea.addEventListener('change', () => recalculate());
+    recalculate();
+
+    function recalculate() {
+      const rollSet = parseDiceRolls(textarea.value);
+      const diceType = guessDiceType(rollSet);
+      const minRollsSuggested = diceType
+        ? suggestedMinimumDiceRolls(diceType.sides)
+        : Number.MAX_SAFE_INTEGER;
+
+      const chiSq = diceType ? calcChiSquared(rollSet, diceType.sides) : 0;
+      const cdf = diceType ? chiSquaredCdfAt(chiSq, diceType.sides) : 0;
+
+      const fmt = (num) =>
+        new Intl.NumberFormat(undefined, { maximumSignificantDigits: 5 })
+          .format(num);
+
+      const results = [
+        '<h3>Die type</h3>',
+
+        diceType
+          ? `<p>This looks like a <strong>${diceType.type}</strong> die; if that's not right, keep adding values and this guess will be updated.</p>`
+          : '<p>Not sure what kind of die this is. Keep rolling.</p>',
+
+          '<h3>Number of rolls</h3>',
+
+        `<p>You\'ve entered <strong>${rollSet.numRolls}</strong> rolls.</p>`,
+
+        diceType
+          ? minRollsSuggested < rollSet.numRolls
+            ? `<p><strong>You should roll at least ${rollSet.numRolls - minRollsSuggested} more times</strong> to get a good fairness estimate, for a total of ${minRollsSuggested} rolls.</p>`
+            : `<p>You've rolled enough times to reasonably assess fainess.</p>`
+          : `<p>Once it's clear what kind of die this is, we'll show you how many more times you should (ideally) roll.</p>`,
+
+        rollSet.numRolls && diceType
+          ? '<h3>Fairness: BLAH BLAH</h3>'
+          : '',
+        rollSet.numRolls && diceType
+          ? `<p>The chi-squared value of your set of rolls is <strong>${fmt(chiSq)}</strong>. The value of the chi-squared distribution at ${fmt(chiSq)}, with ${diceType.sides - 1} (${diceType.sides} sides minus 1) degrees of freedom, is ${fmt(cdf)}. That is, a fair dice would have a chi-squared value of less than this in ${fmt(cdf * 100)}% of tests.</p>`
+          : '',
+      ];
+
+      const html = results.join("\n");
+      report.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

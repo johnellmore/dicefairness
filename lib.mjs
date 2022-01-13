@@ -76,7 +76,7 @@ export function guessDiceType(rollSet) {
   return null;
 }
 
-export function chiSquared(rollSet, sides) {
+export function calcChiSquared(rollSet, sides) {
   // get an array of the different roll totals, where every side that WASN'T
   // rolled is given a 0
   const totals = [...rollSet.rollCounts.values(), ...Array(sides).fill(0)]
@@ -85,4 +85,15 @@ export function chiSquared(rollSet, sides) {
   const chiSq = totals
     .reduce((chi, nk) => chi + (Math.pow(nk - nexp, 2) / nexp), 0);
   return chiSq;
+}
+
+export function chiSquaredCdfAt(chiSqVal, sides) {
+  // hack: I'm lazy and importing the CommonJS module works in the Node.js test
+  // script, but not in the browser. So I just added a script tag to the
+  // index.html file, and I'm referencing it off the `window` object.
+  return window.jStat.chisquare.cdf(chiSqVal, sides - 1);
+}
+
+export function suggestedMinimumDiceRolls(sides) {
+  return 10 * sides;
 }

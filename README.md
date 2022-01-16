@@ -11,13 +11,13 @@ The interface uses a naive guessing algorithm to figure out what kind of die you
 There's no fancy `npm` or `yarn` package installation or local dev environment
 here. The single dependency (jstat) is just included in the repo.
 
-If you want to spin up a local server for development, python's one-line HTTP server is perfect. From the repo's root:
+If you want to spin up a local server for development, python's one-line HTTP server is perfect. Python is included on MacOS and Linux by default, and is easily installed on other OSes. From the repo's root:
 
 ```
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-You can then access the project at [http://127.0.0.1:8000](http://127.0.0.1:8000)
+You can then access the project at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ## Tests
 

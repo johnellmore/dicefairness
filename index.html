@@ -43,6 +43,11 @@
     .interface .report {
       flex: 4 0 300px;
     }
+
+    .below {
+      max-width: 800px;
+      margin: 0 auto 1.5em;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +67,15 @@
     <div class="report">
       <!-- populated by JS below -->
     </div>
+  </div>
+  <div class="below">
+    <p>
+      Huge thanks to <a href="https://rpg.stackexchange.com/a/70803">this answer</a> from the RPG Stack Exchange. This implementation is heavily based on that.
+    </p>
+    <p>
+      A project by <a href="https://johnellmore.com">John Ellmore</a>.
+      <a href="https://github.com/johnellmore/dicefairness">Contribute on Github</a>.
+    </p>
   </div>
   <script src="./jstat.min.js"></script>
   <script type="module">
@@ -107,7 +121,7 @@
         '<h3>Die type</h3>',
 
         diceType
-          ? `<p>This looks like a <strong>${diceType.type}</strong> die; if that's not right, keep adding values and this guess will be updated.</p>`
+          ? `<p>This looks like a <strong>${diceType.type}</strong> die. If that's not right, keep adding values and this guess will be updated.</p>`
           : '<p>Not sure what kind of die this is. Keep rolling.</p>',
 
           '<h3>Number of rolls</h3>',
@@ -131,7 +145,7 @@
           ? `<h3>Fairness: ${fairness}</h3>`
           : '',
         rollSet.numRolls && diceType
-          ? `<p>The chi-squared value of your set of rolls is <strong>${fmt(chiSq)}</strong>. The value of the chi-squared distribution at ${fmt(chiSq)}, with ${diceType.sides - 1} (${diceType.sides} sides minus 1) degrees of freedom, is ${fmt(cdf)}. <strong>This means that a truly fair ${diceType.type} die would have a chi-squared value less than this in ${fmt(cdf * 100)}% of tests.</strong></p>`
+          ? `<p>The chi-squared value of your set of rolls is <strong>${fmt(chiSq)}</strong>. The value of the CDF of the chi-squared distribution at ${fmt(chiSq)}, with ${diceType.sides - 1} (${diceType.sides} sides minus 1) degrees of freedom, is ${fmt(cdf)}. <strong>This means that a truly fair ${diceType.type} die would have a chi-squared value less than this in ${fmt(cdf * 100)}% of tests.</strong></p>`
           : '',
       ];
 

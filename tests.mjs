@@ -1,5 +1,14 @@
 import { calcChiSquared, chiSquaredCdfAt, guessDiceType, makeRollSetFromRolls, parseDiceRolls, RollSet } from './lib.mjs';
 
+// Hack. We can't use ES modules to import jStat in the browser, so lib.mjs
+// grabs it off the window object. So to make the tests work (in Node, where
+// there's no window object), we'll just make a window object and provide the
+// jStat property on it.
+import jStat from './jstat.min.js';
+globalThis.window = {
+  jStat
+};
+
 test('parseDiceRolls() parses a set of clean d6 inputs', () => {
   const input = "5\n1\n4\n1\n4\n2\n1\n3\n5\n4\n";
   const expectedCounts = new Map([
@@ -128,9 +137,8 @@ test('calcChiSquared() reports zero for a uniformly-distributed set of dice roll
   assert(calcChiSquared(rolls, 20) === 0);
 });
 
-test('chiSquaredCdfAt() returns a correct response for a given chi-squared value', () => {
+test('chiSquaredCdfAt() returns a correct response for a known chi-squared value', () => {
   const confidence = chiSquaredCdfAt(27.204, 20);
-  console.log(confidence);
   assert(Math.abs(confidence - 0.90) < 0.001);
 })
 

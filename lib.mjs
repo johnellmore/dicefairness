@@ -94,6 +94,6 @@ export function chiSquaredCdfAt(chiSqVal, sides) {
   return window.jStat.chisquare.cdf(chiSqVal, sides - 1);
 }
 
-export function suggestedMinimumDiceRolls(sides) {
-  return 10 * sides;
+export function minimumDiceRolls(sides) {
+  return 5 * sides;
 }

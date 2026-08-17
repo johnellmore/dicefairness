@@ -69,7 +69,8 @@ export function guessDiceType(rollSet) {
   }
 
   const rollsToSides = rollSet.numRolls / rollSet.rollTypes.size;
-  if (rollsToSides >= 4) {
+  // a die needs at least 2 distinct faces to be assessed for fairness
+  if (rollSet.rollTypes.size >= 2 && rollsToSides >= 4) {
     return {type: 'custom', sides: rollSet.rollTypes.size };
   }
 

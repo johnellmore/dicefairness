@@ -123,6 +123,12 @@ test('guessDiceType() identifies standard dice types', () => {
   assert(d20Guess.sides === 20);
 });
 
+test('guessDiceType() is indeterminate when only one face has ever been rolled', () => {
+  const rolls = Array(10).fill('heads');
+  const guess = guessDiceType(makeRollSetFromRolls(rolls));
+  assert(guess === null);
+});
+
 test('guessDiceType() identifies any collection of side types', () => {
   const rolls = ['b', 'b', 'd', 'c', 'd', 'b', 'a', 'b', 'b', 'b', 'd', 'c', 'd', 'b', 'a', 'b'];
   const guess = guessDiceType(makeRollSetFromRolls(rolls));
